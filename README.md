@@ -15,7 +15,7 @@ The following **required** functionality is completed:
 
 The following **optional** features are implemented:
 
-- [x] A crewmate can be given a category upon creation which restricts their attributes
+- [x] Using the Perspective for interactive analytics and data visualization component (https://perspective.finos.org/)
 
 
 
@@ -23,9 +23,11 @@ The following **optional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-![stock](https://github.com/nanpiyaporn/jpmc-task-1/blob/main/stock.gif){width=50%}
+![stock](https://github.com/nanpiyaporn/jpmc-task-1/blob/main/stock.gif)
 
 ## Notes
+
+Try the Perspective next step
 
 
 
