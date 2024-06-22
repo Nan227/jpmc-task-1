@@ -23,7 +23,7 @@ The following **optional** features are implemented:
 
 Here's a walkthrough of implemented user stories:
 
-![fstock](https://github.com/nanpiyaporn/.gif){width=50%}
+![stock](https://github.com/nanpiyaporn/jpmc-task-1/blob/main/stock.gif){width=50%}
 
 ## Notes
 
