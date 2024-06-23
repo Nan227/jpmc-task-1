@@ -17,6 +17,9 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 #  FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 #  DEALINGS IN THE SOFTWARE.
+from perspective import Table, PerspectiveManager, PerspectiveTornadoHandler
+import tornado.web
+import tornado.ioloop
 
 import csv
 # from BaseHTTPServer import BaseHTTPRequestHandler,HTTPServer
@@ -93,6 +96,12 @@ def orders(hist):
 
 def add_book(book, order, size, _age=10):
     """ Add a new order and size to a book, and age the rest of the book. """
+    # Example book with existing odrders
+    #book = [(1,50,25),(2,150,3)]
+
+    # Add a new order and age the book
+    #updated_book = list(add_book(book, 100, 5, 10))
+
     yield order, size, _age
     for o, s, age in book:
         if age > 0:
@@ -330,7 +339,49 @@ class App(object):
 
 
 ################################################################################
-#
+
+
+# Define the schema for your data
+schema = {
+    "stock": str,
+    "bid": float,
+    "ask": float,
+    "price": float
+    
+}
+
+# Create an instance of PerspectiveManager, and host a Table with the defined schema
+MANAGER = PerspectiveManager()
+TABLE = Table(schema)
+
+# The Table is exposed at `localhost:8888/websocket` with the name `data_source`
+MANAGER.host_table("data_source", TABLE)
+
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.write("Hello, world")
+       
+app_instance = App()
+market_data = app_instance.handle_query(None)
+for stock_info in market_data:
+    stock = stock_info['stock']
+    bid = stock_info['top_bid']['price'] if stock_info['top_bid'] else None
+    ask = stock_info['top_ask']['price'] if stock_info['top_ask'] else None
+    # Update the table with the new data
+    TABLE.update([{"stock": stock, "bid": bid, "ask": ask, "price": (bid + ask) / 2 if bid and ask else None}])
+
+
+app = tornado.web.Application([
+    (r"/", MainHandler),
+    # Create a websocket endpoint that the client JavaScript can access
+    (r"/websocket", PerspectiveTornadoHandler, {"manager": MANAGER, "check_origin": True})
+])
+
+# Start the Tornado server
+# app.listen(8888)
+# print("Server started on localhost:8888")
+# loop = tornado.ioloop.IOLoop.current()
+# loop.start()
 # Main
 
 if __name__ == '__main__':
@@ -338,3 +389,6 @@ if __name__ == '__main__':
         print("No data found, generating...")
         generate_csv()
     run(App())
+    app.listen(8888)
+    print("Server started on http://localhost:8888")
+    tornado.ioloop.IOLoop.current().start()
